@@ -3,7 +3,7 @@ import pandas as pd
 from money_manage import *
 
 # Read data
-df = pd.read_html("Money Manager_2023-12-21.xls", header=0)[0]
+df = pd.read_html("Money Manager_2023-12-22.xls", header=0)[0]
 
 # Clean data
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
@@ -23,8 +23,8 @@ st.markdown("<h1 style='text-align: center;'>💸AM I DOOMED?💸</h1>", unsafe_
 
 # SIDEBAR
 library_option = st.sidebar.selectbox('Select Graph Type', ['Plotly', 'Seaborn'])
-chart_type = st.sidebar.selectbox('Select Chart Type', ['Sunburst Chart', 'Bar Chart'])
-
+chart_type = st.sidebar.selectbox('Select Chart Type', ['Sunburst Chart', 'Bar Chart', 'Treemap'])
+heatmap_type = st.sidebar.selectbox('Select Heatmap Period', ['daily', 'monthly'])
 
 # Main content
 st.title('Finance Dashboard')
@@ -96,3 +96,6 @@ else:
 
 # Display the chart
 st.plotly_chart(fig, use_container_width=True)
+
+
+#### Heatmap

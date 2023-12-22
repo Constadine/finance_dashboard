@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 import datetime 
+import xarray as xr
 
 def get_nlargest(df, n, category):
     
@@ -162,8 +163,11 @@ def calculate_expenses_by_category(df):
     # Filter only expenses
     expenses_df = df[df['Income/Expense'] == 'Expense']
 
-    # Group by Category and Subcategory, and sum the expenses
-    grouped_df = expenses_df.groupby(['Category', 'Subcategory']).agg({'SEK': 'sum'}).reset_index()
+    # Extract Year from the 'Date' column
+    expenses_df['Year'] = expenses_df['Date'].dt.year
+    
+    # Group by Category, Subcategory, and Year, and sum the expenses
+    grouped_df = expenses_df.groupby(['Category', 'Subcategory', 'Year']).agg({'SEK': 'sum'}).reset_index()
     
     return grouped_df
 
@@ -171,14 +175,16 @@ def draw_distribution(df, graph_type):
     df = calculate_expenses_by_category(df)
 
     if graph_type == 'Sunburst Chart':
-        
-        fig = px.sunburst(df, path=['Category', 'Subcategory'], values='SEK',
-                          title='Expense Distribution by Category and Subcategory',
+        fig = px.sunburst(df, path=['Category', 'Subcategory', 'Year'], values='SEK',
+                          title='Expense Distribution by Category, Subcategory, and Year',
                           height=600)
+    elif graph_type == 'Treemap':
+        fig = px.treemap(df, path=['Category', 'Subcategory', 'Year'], values='SEK',
+                         title='Expense Distribution by Category, Subcategory, and Year',
+                         height=600)
     else:
         fig = px.bar(df, x='Category', y='SEK', color='Subcategory',
                      title='Expense Distribution by Category with Subcategories',
                      height=600)
         
     return fig
- 
