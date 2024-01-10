@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 import datetime 
-import xarray as xr
 
 def get_nlargest(df, n, category):
     

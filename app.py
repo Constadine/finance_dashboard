@@ -3,7 +3,7 @@ import pandas as pd
 from money_manage import *
 
 # Read data
-df = pd.read_html("Money Manager_2023-12-22.xls", header=0)[0]
+df = pd.read_html("Money Manager_2024-01-07.xls", header=0)[0]
 
 # Clean data
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
