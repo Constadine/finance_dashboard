@@ -71,7 +71,7 @@ if uploaded_file:
     
     # Create a Streamlit sidebar
     selected_category = st.sidebar.selectbox('Select Expense Category', expenses_df['Category'].unique())
-    time_period = st.sidebar.radio('Select Time Period', ['Month', 'Year'], index=0)  # Default to 'Month'
+    time_period = st.sidebar.radio('Select Time Period', ['Year', 'Month'], index=0)  # Default to 'Month'
     
     # Filter data for the selected category
     selected_category_df = expenses_df[expenses_df['Category'] == selected_category]
@@ -86,18 +86,7 @@ if uploaded_file:
     year_order = list(range(start_year, end_year + 1))
     
     
-    if time_period == 'Month':
-        # Create a bar chart with facets for each month
-        fig = px.bar(monthly_sum_df, x='Year', y='SEK', color='Subcategory',
-                     title=f'Expense Trend Over the Years by Month for {selected_category}',
-                     labels={'SEK': 'Expense (SEK)', 'Year': 'Year'},
-                     facet_col='Month',
-                     height=600,
-                     category_orders={'Year': year_order, 'Month': month_order}
-                     )
-        fig.update_layout(xaxis_title='Year', yaxis_title='Expense (SEK)')
-    
-    else:
+    if time_period == 'Year':
         fig = px.bar(monthly_sum_df, x='Month', y='SEK', color='Subcategory',
                      title=f'Expense Trend Over the Months by {time_period} for {selected_category} ',
                      labels={'SEK': 'Expense (SEK)', 'Month': 'Month'},
@@ -108,10 +97,22 @@ if uploaded_file:
         
         fig.update_layout(xaxis_title='Month', yaxis_title='Expense (SEK)')
     
+    else:
+
+        # Create a bar chart with facets for each month
+        fig = px.bar(monthly_sum_df, x='Year', y='SEK', color='Subcategory',
+                     title=f'Expense Trend Over the Years by Month for {selected_category}',
+                     labels={'SEK': 'Expense (SEK)', 'Year': 'Year'},
+                     facet_col='Month',
+                     height=600,
+                     category_orders={'Year': year_order, 'Month': month_order}
+                     )
+        fig.update_layout(xaxis_title='Year', yaxis_title='Expense (SEK)')
+    
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
     
     
     #### Heatmap
 else:
-    st.warning("Please upload a XLSX file. Open your spreadsheet and save as type '.xlsx'")
+    st.warning("Please upload a XLSX file. IF you do not see your file, open your spreadsheet and save as type '.xlsx'")
