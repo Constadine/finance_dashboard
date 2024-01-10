@@ -22,11 +22,8 @@ if uploaded_file:
     filename, file_extension = os.path.splitext(uploaded_file.name)
 
     if  file_extension == '.xlsx':
-        df = pd.read_excel(uploaded_file.read(), engine='openpyxl')
-    elif file_extension == '.xls':
-        df = pd.read_excel(uploaded_file.read())
-    elif file_extension == '.csv':
-        df = pd.read_csv(uploaded_file.read())
+        df = pd.read_excel(uploaded_file.read() )
+
     else:
         raise Exception("File not supported")
 
