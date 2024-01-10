@@ -2,10 +2,6 @@ import streamlit as st
 import pandas as pd
 from money_manage import *
 import os
-from pathlib import Path
-
-
-
 
 st.set_page_config(
     page_title="Dzikonomy",
@@ -35,9 +31,7 @@ if uploaded_file:
     end_date = df.Date.max()
     start_date = df.Date.min()
     
-    
-    
-    
+
     # TITLE
     st.markdown("<h3 style='text-align: center;'>💸AM I <i>DOOMED</i>?💸</h1>", unsafe_allow_html=True)
     
