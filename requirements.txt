@@ -5,4 +5,5 @@ plotly==5.18.0
 seaborn==0.13.0
 streamlit==1.29.0
 lxml==4.9.4
+html5lib==1.1
 
