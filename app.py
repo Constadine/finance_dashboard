@@ -5,7 +5,7 @@ import os
 
 st.set_page_config(
     page_title="Dzikonomy",
-    page_icon="461boar1_100831.png",  # You can use an emoji or the URL of an image
+    page_icon="🐗",  # You can use an emoji or the URL of an image
     layout="wide",  # You can choose "wide" or "centered"
 )
 
