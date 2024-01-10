@@ -37,11 +37,16 @@ if uploaded_file:
     
     
     # SIDEBAR
+    st.sidebar.subheader("PSST DZIK. Play with parameters here")
+    toggle_table = st.sidebar.toggle("See Data Table")
     library_option = st.sidebar.selectbox('Select Graph Type', ['Plotly', 'Seaborn'])
     chart_type = st.sidebar.selectbox('Select Chart Type', ['Sunburst Chart', 'Bar Chart', 'Treemap'])
     # heatmap_type = st.sidebar.selectbox('Select Heatmap Period', ['daily', 'monthly'])
     
     # Main content
+    
+    if toggle_table:
+        st.dataframe(df, use_container_width=True)
     
     if  library_option == 'Plotly':
         # Call the Plotly function
@@ -55,7 +60,8 @@ if uploaded_file:
         sns_fig = draw_monthly_expenses_income_line_sns(df)
         st.pyplot(sns_fig,use_container_width=True)
     
-    # Create a Streamlit sidebar
+    
+
     
     # Main content
     st.title(f'Expense Distribution for {start_date.year} - {end_date.year}')
@@ -112,7 +118,7 @@ if uploaded_file:
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
     
-    
+
     #### Heatmap
 else:
     st.warning("Please upload a XLSX file. IF you do not see your file, open your spreadsheet and save as type '.xlsx'")
