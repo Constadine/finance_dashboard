@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 from money_manage import *
+from visualization import plot_time_series
+import plotly.express as px
 import os
 
 st.set_page_config(
@@ -38,29 +40,41 @@ if uploaded_file:
     
     # SIDEBAR
     st.sidebar.subheader("PSST DZIK. Play with parameters here")
+    
+    # Search bar for entering the search query
+    search_query = st.sidebar.text_input('Enter search query:')
+
+    # Toggle the dataframe table view
     toggle_table = st.sidebar.toggle("See Data Table")
+    
+    # Choose if you want to include the loan money as income
+    toggle_loan_choice = st.sidebar.toggle('Include Loan Money')
+    
+    # Choose between interactive (plotly) or static (seaborn) line chart
     library_option = st.sidebar.selectbox('Select Graph Type', ['Plotly', 'Seaborn'])
+    
+    # Choose the type of chart for the distribution graph
     chart_type = st.sidebar.selectbox('Select Chart Type', ['Sunburst Chart', 'Bar Chart', 'Treemap'])
     # heatmap_type = st.sidebar.selectbox('Select Heatmap Period', ['daily', 'monthly'])
-    
-    # Main content
-    
+        
     if toggle_table:
-        st.dataframe(df, use_container_width=True)
+        if search_query:
+            filtered_df = filter_dataframe(df, search_query)
+            st.dataframe(filtered_df, use_container_width=True)
+
+        else:
+            st.dataframe(df, use_container_width=True)
+    
     
     if  library_option == 'Plotly':
         # Call the Plotly function
-        plotly_fig = draw_monthly_expenses_income_line_plotly(df)
+        plotly_fig = draw_monthly_expenses_income_line_plotly(df, toggle_loan_choice)
         st.plotly_chart(plotly_fig,use_container_width=True)
     
-    
-        
     elif library_option == 'Seaborn':
         # Call the Seaborn function
         sns_fig = draw_monthly_expenses_income_line_sns(df)
         st.pyplot(sns_fig,use_container_width=True)
-    
-    
 
     
     # Main content
@@ -117,8 +131,9 @@ if uploaded_file:
     
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
-    
 
-    #### Heatmap
+        
+    #### Predictions
+
 else:
     st.warning("Please upload a XLSX file. IF you do not see your file, open your spreadsheet and save as type '.xlsx'")

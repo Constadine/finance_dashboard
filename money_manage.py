@@ -36,13 +36,17 @@ def calculate_monthly_exp_inc(df):
     return monthly_combined_df
     
     
-def calculate_accumulative_total(df):
+def calculate_accumulative_total(df, toggle_loan=False):
+    if not toggle_loan:
+        df = df[df['Subcategory'] != 'Loan']
+
     df = calculate_monthly_exp_inc(df)
     
     df['Cumulative_Expense'] = df['Monthly_Expense'].cumsum()
     df['Cumulative_Income'] = df['Monthly_Income'].cumsum()
     
     df['Accumulative_Total'] = df['Cumulative_Income'] - df['Cumulative_Expense']  
+    
     
     return df
 
@@ -93,10 +97,10 @@ def draw_monthly_expenses_income_line_sns(df):
     # Show the plot
     return plt
 
-def draw_monthly_expenses_income_line_plotly(df):
+def draw_monthly_expenses_income_line_plotly(df, toggle_loan_choice=False):
     # Calculate monthly and accumulative values
-    monthly_combined_df = calculate_monthly_exp_inc(df)
-    monthly_combined_df = calculate_accumulative_total(df)
+    # monthly_combined_df = calculate_monthly_exp_inc(df)
+    monthly_combined_df = calculate_accumulative_total(df, toggle_loan=toggle_loan_choice)
     
     # Create a line chart using Plotly graph objects
     fig = go.Figure()
@@ -187,3 +191,20 @@ def draw_distribution(df, graph_type):
                      height=600)
         
     return fig
+
+# Function to filter DataFrame based on search query
+def filter_dataframe(df, search_query):
+    columns = ['Income/Expense', 'Category', 'Subcategory', 'Note', 'Note.1']
+    # Convert search_query to lowercase for case-insensitive search
+    search_query = search_query.lower()
+    # Filter DataFrame based on search query and specified columns
+    filtered_df = df[df[columns].apply(lambda x: any([search_query in str(x[col]).lower() for col in columns]), axis=1)]
+    return filtered_df
+
+# Function to generate suggestions based on DataFrame column
+def generate_suggestions(df):
+    from_columns = ['Category', 'Subcategory', 'Note','Note.1']
+    suggestions = []
+    for column in from_columns:
+        suggestions.extend(df[column].unique().tolist())
+    return list(set(suggestions)) 
