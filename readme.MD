@@ -1,3 +1,6 @@
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://constadine-finance-dashboard-app-djrmrs.streamlit.app/)
+
+
 Monthly Expenses and Income Trends:
 
 ---Create a line chart to visualize the monthly trends of expenses and income over the four years.
