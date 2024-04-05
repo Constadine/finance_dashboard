@@ -26,7 +26,7 @@ if uploaded_file:
         raise Exception("File not supported")
 
     # Clean data
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
     df = df.dropna(subset=['Date']) 
     df = df.sort_values(by='Date')
     

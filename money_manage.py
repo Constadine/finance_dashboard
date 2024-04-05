@@ -14,26 +14,23 @@ def get_nlargest(df, n, category):
 
 
 
-def calculate_monthly_exp_inc(df):
-    expense_df = df[df['Income/Expense'] == 'Expense']
-    income_df = df[df['Income/Expense'] == 'Income']
-    
-    # Set 'Date' as the index
-    expense_df.set_index('Date', inplace=True)
-    
-    monthly_expenses = expense_df.resample('M').agg({'SEK': 'sum'})
-    
-    # Set 'Date' as the index
-    income_df.set_index('Date', inplace=True)
-    
-    monthly_income = income_df.resample('M').agg({'SEK': 'sum'})
-    
-    monthly_combined_df = pd.merge(monthly_expenses, monthly_income, left_index=True, right_index=True, how='outer')
 
+def calculate_monthly_exp_inc(df):
+    # Convert 'Date' column to datetime type
+    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    
+    # Group by 'Income/Expense' and resample by 'M' (month)
+    monthly_expenses = df[df['Income/Expense'] == 'Expense'].groupby(pd.Grouper(key='Date', freq='M')).agg({'SEK': 'sum'})
+    monthly_income = df[df['Income/Expense'] == 'Income'].groupby(pd.Grouper(key='Date', freq='M')).agg({'SEK': 'sum'})
+    
+    # Combine monthly expenses and income into a single DataFrame
+    monthly_combined_df = pd.merge(monthly_expenses, monthly_income, left_index=True, right_index=True, how='outer')
+    
     # Rename the columns
     monthly_combined_df.columns = ['Monthly_Expense', 'Monthly_Income']
     
     return monthly_combined_df
+
     
     
 def calculate_accumulative_total(df, toggle_loan=False):
@@ -194,7 +191,7 @@ def draw_distribution(df, graph_type):
 
 # Function to filter DataFrame based on search query
 def filter_dataframe(df, search_query):
-    columns = ['Income/Expense', 'Category', 'Subcategory', 'Note', 'Note.1']
+    columns = ['Income/Expense', 'Category', 'Subcategory', 'Note', 'Description']
     # Convert search_query to lowercase for case-insensitive search
     search_query = search_query.lower()
     # Filter DataFrame based on search query and specified columns
