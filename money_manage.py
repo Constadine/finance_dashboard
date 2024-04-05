@@ -211,8 +211,9 @@ def generate_expense_income_ratio_plot(monthly_combined_df):
     monthly_combined_df['expense_income_ratio'] = monthly_combined_df['expense_income_ratio'].replace([np.inf, -np.inf], np.nan)
 
     # Define hover text with final number (income - expense)
-    hover_text = [f"Outcome: {income - expenses:.2f}<br>Expense-to-Income Ratio: {ratio:.2f}" 
-                  for income, expenses, ratio in zip(monthly_combined_df['monthly_income'], 
+    hover_text = [f"Date: {date}<br>Outcome: {income - expenses:.2f}<br>Expense-to-Income Ratio: {ratio:.2f}" 
+                  for date, income, expenses, ratio in zip(monthly_combined_df.index.date,
+                                                      monthly_combined_df['monthly_income'], 
                                                       monthly_combined_df['monthly_expenses'],
                                                       monthly_combined_df['expense_income_ratio'])]
 
