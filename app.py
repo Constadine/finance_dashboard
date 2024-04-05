@@ -135,6 +135,9 @@ if uploaded_file:
     monthly_combined_df = calculate_monthly_exp_inc(df)
     st.plotly_chart(generate_expense_income_ratio_plot(monthly_combined_df), use_container_width= True)
         
+    
+    
+    ##### CREATE A TABLE WITH THE MOST IMPORT STATITSTICS
     #### Predictions
 
 else:
