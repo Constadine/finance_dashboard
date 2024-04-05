@@ -13,8 +13,6 @@ def get_nlargest(df, n, category):
     return res
 
 
-
-
 def calculate_monthly_exp_inc(df):
     # Convert 'Date' column to datetime type
     df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
@@ -27,7 +25,7 @@ def calculate_monthly_exp_inc(df):
     monthly_combined_df = pd.merge(monthly_expenses, monthly_income, left_index=True, right_index=True, how='outer')
     
     # Rename the columns
-    monthly_combined_df.columns = ['Monthly_Expense', 'Monthly_Income']
+    monthly_combined_df.columns = ['monthly_expenses', 'monthly_income']
     
     return monthly_combined_df
 
@@ -39,8 +37,8 @@ def calculate_accumulative_total(df, toggle_loan=False):
 
     df = calculate_monthly_exp_inc(df)
     
-    df['Cumulative_Expense'] = df['Monthly_Expense'].cumsum()
-    df['Cumulative_Income'] = df['Monthly_Income'].cumsum()
+    df['Cumulative_Expense'] = df['monthly_expenses'].cumsum()
+    df['Cumulative_Income'] = df['monthly_income'].cumsum()
     
     df['Accumulative_Total'] = df['Cumulative_Income'] - df['Cumulative_Expense']  
     
@@ -65,8 +63,8 @@ def draw_monthly_expenses_income_line_sns(df):
     # Hardcode the date I came to Sweden
     se_index = datetime.datetime(2022, 8, 21, 20, 50, 17)
     
-    sns.lineplot(x='Date', y='Monthly_Expense', data=monthly_combined_df, marker='v', color='r', label='Expense Trend')
-    sns.lineplot(x='Date', y='Monthly_Income', data=monthly_combined_df, marker='^', color='g', label='Income Trend')
+    sns.lineplot(x='Date', y='monthly_expenses', data=monthly_combined_df, marker='v', color='r', label='Expense Trend')
+    sns.lineplot(x='Date', y='monthly_income', data=monthly_combined_df, marker='^', color='g', label='Income Trend')
     sns.lineplot(x='Date', y='Accumulative_Total', data=monthly_combined_df, marker='', linestyle='-', color='b', label='Total')
 
     # Draw a vertical line at the x-value of the first occurrence of 'SEK'
@@ -74,11 +72,11 @@ def draw_monthly_expenses_income_line_sns(df):
     
     # Add text annotation before the line
     xaxis_greece_text = monthly_combined_df.index[0].date() + (se_index - monthly_combined_df.index[0])/2
-    plt.text(xaxis_greece_text, monthly_combined_df['Monthly_Expense'].max()/2 , 'Greece', ha='right', va='bottom')
+    plt.text(xaxis_greece_text, monthly_combined_df['monthly_expenses'].max()/2 , 'Greece', ha='right', va='bottom')
     
     # Add text annotation after the line
     xaxis_sweden_text = se_index.date() + (monthly_combined_df.index[-1] - se_index)/2
-    plt.text(xaxis_sweden_text, monthly_combined_df['Monthly_Expense'].max()/1.5, 'Sweden', ha='left', va='bottom')
+    plt.text(xaxis_sweden_text, monthly_combined_df['monthly_expenses'].max()/1.5, 'Sweden', ha='left', va='bottom')
     
     
     plt.xticks(rotation=45)
@@ -103,10 +101,10 @@ def draw_monthly_expenses_income_line_plotly(df, toggle_loan_choice=False):
     fig = go.Figure()
     
     # Add lines for Monthly_Income, Monthly_Expense, and Accumulative_Total
-    fig.add_trace(go.Scatter(x=monthly_combined_df.index, y=monthly_combined_df['Monthly_Income'],
+    fig.add_trace(go.Scatter(x=monthly_combined_df.index, y=monthly_combined_df['monthly_income'],
                              mode='lines+markers', name='Monthly Income', marker=dict(symbol='triangle-up')))
     
-    fig.add_trace(go.Scatter(x=monthly_combined_df.index, y=monthly_combined_df['Monthly_Expense'],
+    fig.add_trace(go.Scatter(x=monthly_combined_df.index, y=monthly_combined_df['monthly_expenses'],
                              mode='lines+markers', name='Monthly Expense', marker=dict(symbol='triangle-down')))
     
     fig.add_trace(go.Scatter(x=monthly_combined_df.index, y=monthly_combined_df['Accumulative_Total'],
@@ -205,3 +203,39 @@ def generate_suggestions(df):
     for column in from_columns:
         suggestions.extend(df[column].unique().tolist())
     return list(set(suggestions)) 
+
+
+def generate_expense_income_ratio_plot(monthly_combined_df):
+    # Calculate the expense-to-income ratio for each month, handling division by zero
+    monthly_combined_df['expense_income_ratio'] = monthly_combined_df['monthly_expenses'] / monthly_combined_df['monthly_income']
+    monthly_combined_df['expense_income_ratio'] = monthly_combined_df['expense_income_ratio'].replace([np.inf, -np.inf], np.nan)
+
+    # Define hover text with final number (income - expense)
+    hover_text = [f"Outcome: {income - expenses:.2f}<br>Expense-to-Income Ratio: {ratio:.2f}" 
+                  for income, expenses, ratio in zip(monthly_combined_df['monthly_income'], 
+                                                      monthly_combined_df['monthly_expenses'],
+                                                      monthly_combined_df['expense_income_ratio'])]
+
+    # Define colors based on expense-to-income ratio
+    colors = ['red' if ratio > 1 else 'green' for ratio in monthly_combined_df['expense_income_ratio']]
+
+    # Create a Plotly figure with a single line trace
+    fig = go.Figure()
+
+    # Add a line trace for expense-to-income ratio over time with color coded points
+    fig.add_trace(go.Scatter(x=monthly_combined_df.index, 
+                             y=monthly_combined_df['expense_income_ratio'],
+                             mode='lines+markers',
+                             line=dict(color='lightblue'),  # Set line color to black
+                             marker=dict(color=colors),  # Set marker color based on expense-to-income ratio
+                             name='Expense-to-Income Ratio',
+                             hoverinfo='text',  # Show hover text
+                             hovertext=hover_text))  # Set hover text
+
+    # Update layout
+    fig.update_layout(title='Expense-to-Income Ratio Over Time',
+                       xaxis_title='Date',
+                       yaxis_title='Expense-to-Income Ratio',
+                       yaxis=dict(range=[0, 5]))  # Set y-axis range from 0 to 5
+
+    return fig

@@ -131,7 +131,9 @@ if uploaded_file:
     
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
-
+    
+    monthly_combined_df = calculate_monthly_exp_inc(df)
+    st.plotly_chart(generate_expense_income_ratio_plot(monthly_combined_df), use_container_width= True)
         
     #### Predictions
 
