@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from money_manage import *
-from visualization import plot_time_series
+from visualization import draw_distribution, plot_time_series, generate_expense_income_ratio_plot, draw_monthly_expenses_income_line_plotly
 import plotly.express as px
 import os
 
